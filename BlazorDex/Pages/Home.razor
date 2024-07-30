@@ -1,0 +1,113 @@
+﻿@page "/"
+@using BlazorDex.Models
+@using Util
+@inject PokeClient client
+
+<PageTitle>Home</PageTitle>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .container {
+        margin-top: 50px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pokemon-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 50px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pokemon-card {
+        width: 200px;
+        height: 250px;
+        padding: 10px;
+        background-color: #fff;
+        align-items: center;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0 10px 10px 5px rgba(0,0,0,0.15);
+    }
+
+    img {
+        width: 80%;
+        height: 60%;
+    }
+
+    .type-row {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .pokemon-name {
+        text-transform: capitalize;
+        text-decoration: none;
+        color: black
+    }
+
+    .type-badge {
+        padding: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: white;
+        text-transform: uppercase;
+        margin-right: 3px;
+
+    }
+
+    .app-title {
+        width: 400px;
+        margin: 0 auto 20px auto;
+    }
+
+    a{
+        text-decoration: none;
+    }
+
+</style>
+
+<div class="container">
+    <img src="/img/AnyConv.com__PokeBanner.png" alt="app title" class="app-title" />
+    <div class="pokemon-row">
+        @foreach (var pokemon in pokemonsList)
+        {
+            <a href="/pokemon/@pokemon.id">
+                <div class="pokemon-card">
+                    <img src="@pokemon.sprites.front_default" alt="Pokemon Sprite" />
+                    <h4 class="pokemon-name">@pokemon.name</h4>
+                    <div class="type-row">
+                        @foreach (var type in pokemon.types)
+                        {
+                            <span class="type-badge" style="background-color: @PokeColor.GetTypeColor(@type.type.name)">@type.type.name</span>
+                        }
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+</div>
+
+@code {
+
+
+    List<Pokemons> pokemonsList = new List<Pokemons>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        for (int i = 1; i < 152; i++)
+        {
+            pokemonsList.Add(await client.GetPokemons(i.ToString()));
+            StateHasChanged();
+        }
+
+    }
+}
